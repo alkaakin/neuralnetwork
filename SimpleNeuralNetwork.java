@@ -1,51 +1,50 @@
 import java.util.Arrays;
-import java.util.Random;
 
 public class SimpleNeuralNetwork {
 
     static class SingleLayerNetwork {
-        private final double[][] weights;
-        private final double[] bias;
+        private final Perceptron[] perceptrons;
 
-        // y = W x + b
+        // Creates a single-layer network with a layer of perceptrons
+        // inputSize: number of inputs to each perceptron
+        // outputSize: number of perceptrons in the layer
         public SingleLayerNetwork(int inputSize, int outputSize) {
-            this.weights = new double[outputSize][inputSize];
-            this.bias = new double[outputSize];
-            initializeParameters();
-        }
-
-        private void initializeParameters() {
-            Random random = new Random();
-            for (int outputIndex = 0; outputIndex < weights.length; outputIndex++) {
-                for (int inputIndex = 0; inputIndex < weights[outputIndex].length; inputIndex++) {
-                    weights[outputIndex][inputIndex] = random.nextDouble() * 2 - 1;
-                }
-                bias[outputIndex] = random.nextDouble() * 2 - 1;
+            this.perceptrons = new Perceptron[outputSize];
+            for (int i = 0; i < outputSize; i++) {
+                perceptrons[i] = new Perceptron(inputSize);
             }
         }
 
         public double[] predict(double[] inputs) {
-            if (inputs.length != weights[0].length) {
-                throw new IllegalArgumentException("Input size must match weight columns.");
+            if (inputs.length != perceptrons[0].getWeights().length) {
+                throw new IllegalArgumentException("Input size must match perceptron input size.");
             }
 
-            double[] outputs = new double[weights.length];
-            for (int outputIndex = 0; outputIndex < weights.length; outputIndex++) {
-                double sum = 0.0;
-                for (int inputIndex = 0; inputIndex < inputs.length; inputIndex++) {
-                    sum += weights[outputIndex][inputIndex] * inputs[inputIndex];
-                }
-                outputs[outputIndex] = sum + bias[outputIndex];
+            double[] outputs = new double[perceptrons.length];
+            for (int i = 0; i < perceptrons.length; i++) {
+                outputs[i] = perceptrons[i].activate(inputs);
             }
             return outputs;
         }
 
         public double[][] getWeights() {
+            double[][] weights = new double[perceptrons.length][];
+            for (int i = 0; i < perceptrons.length; i++) {
+                weights[i] = perceptrons[i].getWeights();
+            }
             return weights;
         }
 
         public double[] getBias() {
-            return bias;
+            double[] biases = new double[perceptrons.length];
+            for (int i = 0; i < perceptrons.length; i++) {
+                biases[i] = perceptrons[i].getBias();
+            }
+            return biases;
+        }
+
+        public Perceptron[] getPerceptrons() {
+            return perceptrons.clone();
         }
     }
 
