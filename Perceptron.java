@@ -1,56 +1,65 @@
-import java.util.Scanner;
+import java.util.Random;
 
 public class Perceptron {
-    private int[] inputs;
-    private int[] weights;
-    private int bias;
+    private double[] weights;
+    private double bias;
 
-    public static void main(String args[]) throws java.io.IOException {
-        int[] answerInputs = new int[3];
-        Perceptron perceptron = new Perceptron();
-        perceptron.run(answerInputs);
-        perceptron.setInputs(answerInputs);
-        int output = perceptron.activate();
-        System.out.println("Perceptron output: " + output);
+    // Constructor: creates a perceptron with given input size
+    public Perceptron(int inputSize) {
+        this.weights = new double[inputSize];
+        this.bias = 0.0;
+        initializeParameters();
     }
 
-    public Perceptron(){
-        int wWeather = 4; //Weight for the current weather
-        int wCompany = 2; //Weight for the availability of company
-        int wProximity = 2; //Weight for the proximity of a movie theater
-        this.bias = -5; //Only go to the movies when the weather is good, which shows in the bias
-        this.weights = new int [] { wWeather, wCompany, wProximity };
-        this.inputs = new int[3];
+    // Constructor: creates a perceptron with given weights and bias
+    public Perceptron(double[] weights, double bias) {
+        this.weights = weights.clone();
+        this.bias = bias;
     }
-    
-    public void run(int[] answerInputs) {    
-        Scanner scanner = new Scanner(System.in);
-        String[] questions = {
-                "Is the weather good? (yes or no)",
-                 "Do you have company? (yes or no)",
-                "Is the theatre close by? (yes or no)"
-            };
-        for (int i = 0; i < questions.length; i++) {
-            answerInputs[i] = askQuestion(scanner, questions[i]);
-            }
-        }
-            
-        private int askQuestion(Scanner scanner, String question) {
-            System.out.print(question + " ");
-            String answer = scanner.nextLine().trim().toLowerCase();
-            return answer.equals("yes") ? 1 : 0;
-        }
-     
-        public void setInputs(int[] answerInputs) {
-            this.inputs = answerInputs;
-        }
 
-        public int activate() {
-            int sum = 0;
-            for (int i = 0; i < weights.length; i++) {
-                sum += weights[i] * inputs[i]; // Weighted sum of inputs
-            }
-            sum += bias; // Add bias
-            return (sum > 0) ? 1 : 0; // Activation function (step function)
+    // Initialize weights and bias with random values between -1 and 1
+    private void initializeParameters() {
+        Random random = new Random();
+        for (int i = 0; i < weights.length; i++) {
+            weights[i] = random.nextDouble() * 2 - 1;
         }
+        this.bias = random.nextDouble() * 2 - 1;
+    }
+
+    // Activation function: step function (returns 1 if sum > 0, else 0)
+    public int activate(int[] inputs) {
+        double sum = 0.0;
+        for (int i = 0; i < weights.length; i++) {
+            sum += weights[i] * inputs[i];
+        }
+        sum += bias;
+        return (sum > 0) ? 1 : 0;
+    }
+
+    // Activation function: returns the weighted sum + bias (for linear output)
+    public double activate(double[] inputs) {
+        double sum = 0.0;
+        for (int i = 0; i < weights.length; i++) {
+            sum += weights[i] * inputs[i];
+        }
+        return sum + bias;
+    }
+
+    // Getters
+    public double[] getWeights() {
+        return weights.clone();
+    }
+
+    public double getBias() {
+        return bias;
+    }
+
+    // Setters
+    public void setWeights(double[] weights) {
+        this.weights = weights.clone();
+    }
+
+    public void setBias(double bias) {
+        this.bias = bias;
+    }
 }
